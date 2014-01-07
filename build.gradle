@@ -1,0 +1,63 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "net.saliman:gradle-cobertura-plugin:2.2.2"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'cobertura'
+apply plugin: 'idea'
+
+group = 'com.jakewharton'
+version = '2.0.3-SNAPSHOT'
+
+description = 'Disk LRU Cache'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+     maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath = sourceSets.main.output + configurations.testRuntime
+        runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
+        java {
+            srcDir 'src/integrationTest/java'
+        }
+    }
+    stressTest {
+        compileClasspath = sourceSets.main.output + configurations.testRuntime
+        runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
+        java {
+            srcDir 'src/stressTest/java'
+        }
+    }
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+dependencies {
+    compile 'com.esotericsoftware.kryo:kryo:2.22'
+    compile 'com.intellij:annotations:12.0'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+    testCompile 'org.apache.commons:commons-io:1.3.2'
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.integrationTest.allSource.srcDirs
+        testSourceDirs += sourceSets.stressTest.allSource.srcDirs
+    }
+}
